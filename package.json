@@ -21,9 +21,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron:serve": "concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
-    "electron:start": "wait-on tcp:3000 && electron .",
-    "electron:build": "yarn build && electron-builder --windows nsis:x64 -c.extraMetadata.main=build/electron.js"
+    "start-electron": "concurrently -k \"BROWSER=none npm start\" \"npm:electron\"",
+    "electron": "wait-on tcp:3000 && electron ."
   },
   "build": {
     "extends": null,
@@ -57,11 +56,9 @@
     ]
   },
   "devDependencies": {
-    "concurrently": "^5.3.0",
-    "cross-env": "^7.0.3",
+    "concurrently": "^7.6.0",
     "electron": "^11.2.1",
-    "electron-builder": "^22.9.1",
     "prettier": "^2.2.1",
-    "wait-on": "^5.2.1"
+    "wait-on": "^7.0.1"
   }
 }

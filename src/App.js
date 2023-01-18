@@ -1,7 +1,8 @@
 function App() {
   return (
-    <div className="container mt-2">
-      <h1>hello</h1>
+    <div>
+      <h1>This app is running by electron</h1>
+      <p>This is a <a href="https://www.electronjs.org/">Doc</a></p>
     </div>
   )
 }
