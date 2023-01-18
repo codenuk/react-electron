@@ -1,10 +1,8 @@
-window.addEventListener('DOMContentLoaded', () => {
-  const replaceText = (selector, text) => {
-    const element = document.getElementById(selector)
-    if (element) element.innerText = text
-  }
+const { ipcRenderer } = require('electron')
 
-  for (const dependency of ['chrome', 'node', 'electron']) {
-    replaceText(`${dependency}-version`, process.versions[dependency])
-  }
+window.addEventListener('DOMContentLoaded', () => {
+  let btnLogin = document.getElementById('btnLogin')
+  btnLogin.addEventListener('click', () => {
+    ipcRenderer.send('readFileCSV')
+  })
 })

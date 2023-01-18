@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const url = require("url");
+const url = require('url')
+const fs = require('fs')
 
 const createWindow = () => {
   // Create the browser window.
@@ -19,11 +20,11 @@ const createWindow = () => {
   // and load the index.html of the app.
   const appURL = app.isPackaged
     ? url.format({
-        pathname: path.join(__dirname, "index.html"),
-        protocol: "file:",
-        slashes: true,
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
       })
-    : "http://localhost:3000";
+    : 'http://localhost:3000'
   mainWindow.loadURL(appURL)
   // mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
@@ -53,3 +54,12 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.on('readFileCSV', event => {
+  try {
+    const data = fs.readFileSync('/Users/supagornsirimaleewattana/Desktop/Nurse_IPD.csv', 'utf8')
+    console.log(data)
+  } catch (err) {
+    console.error(err)
+  }
+})
