@@ -1,2 +1,3 @@
-yarn run electron:serve สำหรับ Test run in local
-yarn run electron:build สำหรับ build สร้าง File Exe for install in window
+- npm run electron:start # For Start in local
+- npm run electron:package:mac # For build file .dmg. used it install to macOS
+- npm run electron:package:win # For build file .exe. used it install to winOS

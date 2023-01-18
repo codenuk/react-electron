@@ -21,20 +21,30 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "start-electron": "concurrently -k \"BROWSER=none npm start\" \"npm:electron\"",
-    "electron": "wait-on tcp:3000 && electron ."
+    "electron": "wait-on tcp:3000 && electron .",
+    "electron:start": "concurrently -k \"BROWSER=none npm start\" \"npm:electron\"",
+    "electron:package:mac": "npm run build && electron-builder -m -c.extraMetadata.main=build/electron.js",
+    "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js",
+    "electron:package:linux": "npm run build && electron-builder -l -c.extraMetadata.main=build/electron.js"
   },
   "build": {
-    "extends": null,
-    "appId": "com.example.electron-cra",
+    "appId": "com.electron.myapp",
+    "productName": "My Electron App",
     "files": [
-      "dist/**/*",
       "build/**/*",
-      "node_modules/**/*",
-      "package.json"
+      "node_modules/**/*"
     ],
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "public"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "deb"
     }
   },
   "eslintConfig": {
@@ -58,6 +68,7 @@
   "devDependencies": {
     "concurrently": "^7.6.0",
     "electron": "^11.2.1",
+    "electron-builder": "^23.6.0",
     "prettier": "^2.2.1",
     "wait-on": "^7.0.1"
   }
