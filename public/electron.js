@@ -2,7 +2,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const url = require('url')
-const fs = require('fs')
+const isDev = require('electron-is-dev')
 
 const createWindow = () => {
   // Create the browser window.
@@ -11,10 +11,12 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true,
       enableRemoteModule: true,
-      preload: path.join(__dirname, 'preload.js')
-    }
+      preload: path.join(__dirname, 'preload.js'),
+      icon: path.join(__dirname, 'favicon.ico'),
+      devTools: isDev ? true : false,
+    },
   })
 
   // and load the index.html of the app.
@@ -22,11 +24,10 @@ const createWindow = () => {
     ? url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
-        slashes: true
+        slashes: true,
       })
     : 'http://localhost:3000'
   mainWindow.loadURL(appURL)
-  // mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -49,17 +50,17 @@ app.on('activate', () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
 })
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on('readFileCSV', event => {
-  try {
-    const data = fs.readFileSync('/Users/supagornsirimaleewattana/Desktop/Nurse_IPD.csv', 'utf8')
-    console.log(data)
-  } catch (err) {
-    console.error(err)
-  }
-})
+const { checkStatus } = require('./services/status')
+const { insertString, getAllString } = require('./services/database')
+
+ipcMain.handle('checkStatus', checkStatus)
+ipcMain.handle('insertString', insertString)
+ipcMain.handle('getAllString', getAllString)

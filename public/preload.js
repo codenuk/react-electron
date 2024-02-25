@@ -1,8 +1,7 @@
-const { ipcRenderer } = require('electron')
+const { contextBridge, ipcRenderer } = require('electron')
 
-window.addEventListener('DOMContentLoaded', () => {
-  let btnLogin = document.getElementById('btnLogin')
-  btnLogin.addEventListener('click', () => {
-    ipcRenderer.send('readFileCSV')
-  })
+contextBridge.exposeInMainWorld('electronAPI', {
+  checkStatus: () => ipcRenderer.invoke('checkStatus'),
+  getAllString: () => ipcRenderer.invoke('getAllString'),
+  insertString: (values) => ipcRenderer.invoke('insertString', values),
 })
