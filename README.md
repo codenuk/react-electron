@@ -107,73 +107,118 @@ for connect between website with comport, file in local or serialNumber computor
     ```bash
     npm install sqlite3
     ```
-  - Create file `public/database.db` for keep data.
-  - After Create use DBeaver program open that file and create table and column.
   - Add some line file `public/preload.js`
     ```js
     const { contextBridge, ipcRenderer } = require('electron')
   
     contextBridge.exposeInMainWorld('electronAPI', {
       checkStatus: () => ipcRenderer.invoke('checkStatus'),
-      getAllString: () => ipcRenderer.invoke('getAllString'),
-      insertString: (values) => ipcRenderer.invoke('insertString', values),
+      intitialSetup: () => ipcRenderer.invoke('intitialSetup'),
+      getAllContacts: () => ipcRenderer.invoke('getAllContacts'),
+      insertContacts: (values) => ipcRenderer.invoke('insertContacts', values),
     })
     ```
   - Update file `public/electron.js`
     ```js
-    const { insertString, getAllString } = require('./services/database')
+    const { intitialSetup, getAllContacts, insertContacts } = require('./services/database')
   
-    ipcMain.handle('insertString', insertString)
-    ipcMain.handle('getAllString', getAllString)
+    ipcMain.handle('intitialSetup', intitialSetup)
+    ipcMain.handle('insertContacts', (event, values) => insertContacts(event, values))
+    ipcMain.handle('getAllContacts', getAllContacts)
     ```
   - Create file `public/services/database.js`
     ```js
     const sqlite3 = require('sqlite3').verbose()
     const path = require('path')
+    const pathDatabase = path
+      .join('database.db')
+      .replace('app.asar', 'app.asar.unpacked')
     
-    const insertString = async values => {
-      // const { id } = values
-    
-      let db = new sqlite3.Database(path.join(__dirname, '../database.db'))
-      
-      // insert one row into the langs table
-      db.run(`INSERT INTO test(id) VALUES(?)`, ['ASDASDASD'], function (err) {
-        if (err) {
-          return console.log(err.message)
-        }
-        // get the last insert id
-        console.log(`A row has been inserted with rowid ${this.lastID}`)
-      })
-    
-      // close the database connection
-      db.close()
-    }
-    
-    const getAllString = async () => {
-      // open the database
-      let db = new sqlite3.Database(path.join(__dirname, '../database.db'))
-      console.log(db)
-    
-      let sql = `SELECT * FROM test`
-    
-      console.log(sql)
-    
-      db.all(sql, [], (err, rows) => {
-        if (err) {
-          console.log(err)
-          throw err
-        }
-        rows.forEach(row => {
-          console.log(row)
+    const intitialSetup = async () => {
+      try {
+        const db = new sqlite3.Database(pathDatabase, err => {
+          if (err) {
+            console.error('Error connecting database: ', err)
+          }
         })
-      })
-    
-      // close the database connection
-      db.close()
+      
+        // Create a table
+        db.run('CREATE TABLE IF NOT EXISTS contacts (name TEXT, email TEXT)', err => {
+          if (err) {
+            console.error('Error creating table: ', err)
+          }
+        })
+      
+        // Close the database
+        db.close(err => {
+          if (err) {
+            console.error('Error closing database: ', err)
+          }
+        })
+        return true
+      } catch (error) {
+        return error
+      }
     }
     
-    module.exports = { getAllString, insertString }
+    const insertContacts = async (_, values) => {
+      try {
+        const { name, email } = values
+    
+        const promiseInsertData = new Promise((resolve, reject) => {
+          const db = new sqlite3.Database(pathDatabase)
+          const sql = `INSERT INTO contacts(name, email) VALUES(?, ?)`
+          // insert one row into the langs table
+    
+          db.run(sql, [name, email], function (err) {
+            if (err) {
+              console.log('err insertContacts: ', err)
+              reject(err)
+            }
+    
+            // get the last insert id
+            console.log(`A row has been inserted with rowid ${this.lastID}`)
+            resolve(true)
+          })
+    
+          // close the database connection
+          db.close()
+        })
+    
+        const insertData = await promiseInsertData
+        return insertData
+      } catch (error) {
+        return error
+      }
+    }
+    
+    const getAllContacts = async () => {
+      try {
+        const promiseGetData = new Promise((resolve, reject) => {
+          // open the database
+          const db = new sqlite3.Database(pathDatabase)
+    
+          const sql = `SELECT * FROM contacts`
+          db.all(sql, [], (err, rows) => {
+            if (err) reject(err)
+    
+            resolve(rows)
+          })
+    
+          // close the database connection
+          db.close()
+        })
+        const getData = await promiseGetData
+    
+        return getData
+      } catch (error) {
+        return error
+      }
+    }
+    
+    module.exports = { intitialSetup, getAllContacts, insertContacts }
     ```
+
 - Run local
   ```bash
   npm run electron:start # For Start in local

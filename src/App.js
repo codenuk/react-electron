@@ -1,7 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function App() {
+  const [dataList, setDataList] = useState([])
   const [msg, setMsg] = useState('')
+
+  useEffect(() => {
+    async function callIntitialSetup() {
+      const result = await window.electronAPI.intitialSetup()
+
+      console.log('intitialSetup: ', result)
+    }
+    callIntitialSetup()
+  }, [])
 
   const handleCheckStatus = () => {
     async function callCheckStatus() {
@@ -12,16 +22,21 @@ function App() {
     callCheckStatus()
   }
 
-  const handleInsertString = () => {
-    async function callCheckStatus() {
-      await window.electronAPI.insertString({ id: '1' })
+  const handleInsert = () => {
+    let r = (Math.random() + 1).toString(36).substring(7);
+
+    async function callInsertString() {
+      const result = await window.electronAPI.insertContacts({ name: r, email: `${r}@gmail.com` })
+      console.log('insertContacts: ', result)
     }
-    callCheckStatus()
+    callInsertString()
   }
 
-  const handleQueryString = () => {
+  const handleQuery = () => {
     async function callCheckQuery() {
-      await window.electronAPI.getAllString()
+      const result = await window.electronAPI.getAllContacts()
+      console.log('getAllContacts: ', result)
+      setDataList(result)
     }
     callCheckQuery()
   }
@@ -36,13 +51,15 @@ function App() {
       </button>
       <p>MSG: {msg}</p>
 
-<button type="butotn" onClick={handleInsertString}>
-  Insert
-</button>
+      <button type="butotn" onClick={handleInsert}>
+        Insert
+      </button>
 
-<button type="butotn" onClick={handleQueryString}>
-  Query
-</button>
+      <button type="butotn" onClick={handleQuery}>
+        Query
+      </button>
+
+      {dataList.map((data, index) => (<p key={index}>{index + 1} name: {data.name}, email: {data.email}</p>))}
     </div>
   )
 }

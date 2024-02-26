@@ -15,7 +15,8 @@ const createWindow = () => {
       enableRemoteModule: true,
       preload: path.join(__dirname, 'preload.js'),
       icon: path.join(__dirname, 'favicon.ico'),
-      devTools: isDev ? true : false,
+      // devTools: isDev ? true : false,
+      devTools: true
     },
   })
 
@@ -59,8 +60,10 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 const { checkStatus } = require('./services/status')
-const { insertString, getAllString } = require('./services/database')
+const { intitialSetup, getAllContacts, insertContacts } = require('./services/database')
 
 ipcMain.handle('checkStatus', checkStatus)
-ipcMain.handle('insertString', insertString)
-ipcMain.handle('getAllString', getAllString)
+
+ipcMain.handle('intitialSetup', intitialSetup)
+ipcMain.handle('insertContacts', (event, values) => insertContacts(event, values))
+ipcMain.handle('getAllContacts', getAllContacts)
