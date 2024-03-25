@@ -228,6 +228,8 @@ for connect between website with comport, file in local or serialNumber computor
   - setup package.json for build format install to OS.
     ```json
     "scripts": {
+       "electron": "wait-on tcp:3000 && electron .",
+       "electron:start": "concurrently -k \"npm start\" \"npm:electron\"",
        "electron:package:mac": "npm run build && electron-builder -m -c.extraMetadata.main=build/electron.js", // For build file .dmg. used it install to macOS
        "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js", // For build file .exe. used it install to winOS
        "electron:package:linux": "npm run build && electron-builder -l -c.extraMetadata.main=build/electron.js"
