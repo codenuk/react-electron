@@ -3,10 +3,10 @@
 - Install package
   ```
   npm install electron-is-dev
-  npm install concurrently
-  npm install electron
-  npm install electron-builder
-  npm install wait-on
+  npm install --save-dev concurrently
+  npm install --save-dev electron
+  npm install --save-dev electron-builder
+  npm install --save-dev wait-on
   ```
 
 - Create file `public/electron.js` for convert web to desktop application
